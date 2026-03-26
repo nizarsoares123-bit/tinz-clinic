@@ -1,17 +1,13 @@
 <script type="module">
-  // Usando um link direto e mais estável da biblioteca
   import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-  // --- CONFIGURAÇÃO DA CHAVE ---
-  const API_KEY = "AIzaSyDLCrNJBlo8QlYP7LVUpsEE5RIW7RhNPqY"; 
-  // -----------------------------
+  // 1. COLE SUA CHAVE NOVA ABAIXO
+  const API_KEY = "SUA_NOVA_CHAVE_AQUI"; 
 
   const genAI = new GoogleGenerativeAI(API_KEY);
 
-  // O SEGREDO: Vamos usar a URL de produção v1beta para evitar o erro 404
-  const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash"
-  });
+  // 2. USANDO O MODELO FLASH 1.5 (VERSÃO ESTÁVEL)
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   window.enviarMensagem = async function() {
     const input = document.getElementById('user-input');
@@ -25,16 +21,16 @@
     container.scrollTop = container.scrollHeight;
 
     try {
-      // Forçando a chamada para o modelo flash mais estável
+      // Chamada direta
       const result = await model.generateContent(texto);
       const response = await result.response;
-      const respostaIA = response.text();
+      const text = response.text();
 
-      container.innerHTML += `<div class="message ai-message">${respostaIA}</div>`;
+      container.innerHTML += `<div class="message ai-message">${text}</div>`;
       container.scrollTop = container.scrollHeight;
     } catch (error) {
-      console.error("Erro detalhado:", error);
-      container.innerHTML += `<div class="message ai-message">Erro 404: O Google não encontrou o modelo. Verifique se a API Generative Language está ativa no seu projeto do Google Cloud.</div>`;
+      console.error("Erro técnico:", error);
+      container.innerHTML += `<div class="message ai-message">Erro: O Google recusou a conexão. Verifique se a API Generative Language está ativa no console.cloud.google.com</div>`;
     }
   }
 </script>
