@@ -1,36 +1,66 @@
-<script type="module">
-  import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TINZ Clinic - Assistente</title>
+    <style>
+        body { font-family: sans-serif; background-color: #CCFBF1; display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        header { background: #14B8A6; color: white; padding: 15px; text-align: center; }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px; border-radius: 10px; max-width: 80%; }
+        .user { background: #14B8A6; color: white; align-self: flex-end; }
+        .ai { background: white; align-self: flex-start; border: 1px solid #14B8A6; }
+        #input-area { padding: 20px; background: white; display: flex; gap: 10px; }
+        input { flex: 1; padding: 10px; border: 1px solid #14B8A6; border-radius: 5px; }
+        button { background: #14B8A6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header><h2>TINZ Clinic</h2></header>
+    <div id="chat"></div>
+    <div id="input-area">
+        <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+        <button onclick="enviar()">Enviar</button>
+    </div>
 
-  // 1. COLE SUA CHAVE NOVA ABAIXO
-  const API_KEY = "SUA_NOVA_CHAVE_AQUI"; 
+    <script>
+        async function enviar() {
+            const input = document.getElementById('msgInput');
+            const chat = document.getElementById('chat');
+            const texto = input.value.trim();
+            if (!texto) return;
 
-  const genAI = new GoogleGenerativeAI(API_KEY);
+            // 1. SUA CHAVE AQUI (Gere uma NOVA no AI Studio agora!)
+            const MINHA_CHAVE = "AIzaSyBN-xemSmrpDSQtda9-2rpeTxSADTwxaVc"; 
 
-  // 2. USANDO O MODELO FLASH 1.5 (VERSÃO ESTÁVEL)
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            chat.innerHTML += `<div class="msg user">${texto}</div>`;
+            input.value = '';
 
-  window.enviarMensagem = async function() {
-    const input = document.getElementById('user-input');
-    const container = document.getElementById('chat-container');
-    const texto = input.value.trim();
+            try {
+                // USANDO A URL DIRETA (Isso evita o Erro 404 das bibliotecas)
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: texto }] }] })
+                });
 
-    if (!texto) return;
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
 
-    container.innerHTML += `<div class="message user-message">${texto}</div>`;
-    input.value = '';
-    container.scrollTop = container.scrollHeight;
-
-    try {
-      // Chamada direta
-      const result = await model.generateContent(texto);
-      const response = await result.response;
-      const text = response.text();
-
-      container.innerHTML += `<div class="message ai-message">${text}</div>`;
-      container.scrollTop = container.scrollHeight;
-    } catch (error) {
-      console.error("Erro técnico:", error);
-      container.innerHTML += `<div class="message ai-message">Erro: O Google recusou a conexão. Verifique se a API Generative Language está ativa no console.cloud.google.com</div>`;
-    }
-  }
-</script>
+                const respostaIA = data.candidates[0].content.parts[0].text;
+                chat.innerHTML += `<div class="msg ai">${respostaIA}</div>`;
+            } catch (e) {
+                console.error(e);
+                chat.innerHTML += `<div class="msg ai">Erro: ${e.message}</div>`;
+            }
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>
