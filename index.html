@@ -15,17 +15,11 @@
         #input-area { padding: 20px; background: white; display: flex; gap: 10px; border-top: 1px solid #ddd; }
         input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; outline: none; }
         button { background: var(--primaria); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        button:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
-    <header>
-        <strong>TINZ Clinic</strong><br>
-        <small>Assistente de Gestão em Saúde</small>
-    </header>
-    <div id="chat">
-        <div class="msg ai">Olá! Sou o assistente da TINZ Clinic. Como posso ajudar hoje?</div>
-    </div>
+    <header><strong>TINZ Clinic</strong><br><small>Assistente de Gestão em Saúde</small></header>
+    <div id="chat"><div class="msg ai">Olá, Nizar! Sou o assistente da TINZ Clinic. Como posso ajudar?</div></div>
     <div id="input-area">
         <input type="text" id="msgInput" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter') enviar()">
         <button onclick="enviar()">Enviar</button>
@@ -36,12 +30,11 @@
             const input = document.getElementById('msgInput');
             const chat = document.getElementById('chat');
             const texto = input.value.trim();
-            
             if (!texto) return;
 
             // --- ESPAÇO DA CHAVE ---
-            // COLOQUE SUA CHAVE NOVA DO AI STUDIO ENTRE AS ASPAS:
-            const MINHA_CHAVE = "AIzaSyCq8Rbhw-Wowt-vADxyqOP5OGW_m8lNcVs"; 
+            // PEGUE UMA CHAVE NOVA NO AI STUDIO (CREATE API KEY IN NEW PROJECT)
+            const MINHA_CHAVE = "AIzaSyBSdk0HJHOK6XPzo3X9QcBjkYZJWqGdiiY"; 
             // -----------------------
 
             chat.innerHTML += `<div class="msg user">${texto}</div>`;
@@ -49,27 +42,23 @@
             chat.scrollTop = chat.scrollHeight;
 
             try {
-                // Rota direta v1beta - a mais estável para o Gemini 1.5 Flash
+                // Chamada direta para o servidor do Google (SEM BIBLIOTECAS EXTERNAS)
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE}`;
                 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: texto }] }]
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: texto }] }] })
                 });
 
                 const data = await response.json();
 
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
+                if (data.error) throw new Error(data.error.message);
 
                 const respostaIA = data.candidates[0].content.parts[0].text;
                 chat.innerHTML += `<div class="msg ai">${respostaIA}</div>`;
             } catch (e) {
-                console.error("Erro detalhado:", e);
+                console.error("Erro:", e);
                 chat.innerHTML += `<div class="msg ai" style="color:red">Erro: ${e.message}</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
