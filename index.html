@@ -9,7 +9,7 @@
         body { font-family: sans-serif; background-color: var(--secundaria); margin: 0; display: flex; flex-direction: column; height: 100vh; }
         header { background: var(--primaria); color: white; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 12px; border-radius: 12px; max-width: 80%; line-height: 1.4; }
+        .msg { padding: 12px; border-radius: 12px; max-width: 80%; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .user { background: var(--primaria); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
         .ai { background: white; color: #333; align-self: flex-start; border: 1px solid var(--primaria); border-bottom-left-radius: 2px; }
         #input-area { padding: 20px; background: white; display: flex; gap: 10px; border-top: 1px solid #ddd; }
@@ -19,7 +19,7 @@
 </head>
 <body>
     <header><strong>TINZ Clinic</strong><br><small>Assistente de Gestão em Saúde</small></header>
-    <div id="chat"><div class="msg ai">Olá, Nizar! Sou o assistente da TINZ Clinic. Como posso ajudar?</div></div>
+    <div id="chat"><div class="msg ai">Olá! Sou o assistente da TINZ Clinic. Como posso ajudar agora?</div></div>
     <div id="input-area">
         <input type="text" id="msgInput" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter') enviar()">
         <button onclick="enviar()">Enviar</button>
@@ -34,7 +34,7 @@
 
             // --- ESPAÇO DA CHAVE ---
             // PEGUE UMA CHAVE NOVA NO AI STUDIO (CREATE API KEY IN NEW PROJECT)
-            const MINHA_CHAVE = "AIzaSyBSdk0HJHOK6XPzo3X9QcBjkYZJWqGdiiY"; 
+            const MINHA_CHAVE = "AIzaSyDCXtHZdggUFg6GNhJ5-oK_Egr9gBK5F8c"; 
             // -----------------------
 
             chat.innerHTML += `<div class="msg user">${texto}</div>`;
@@ -58,7 +58,7 @@
                 const respostaIA = data.candidates[0].content.parts[0].text;
                 chat.innerHTML += `<div class="msg ai">${respostaIA}</div>`;
             } catch (e) {
-                console.error("Erro:", e);
+                console.error("Erro técnico:", e);
                 chat.innerHTML += `<div class="msg ai" style="color:red">Erro: ${e.message}</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
