@@ -27,33 +27,43 @@
 
     <script>
         async function enviar() {
-            const input = document.getElementById('msgInput');
-            const chat = document.getElementById('chat');
-            const texto = input.value.trim();
-            if (!texto) return;
+    const input = document.getElementById('msgInput');
+    const chat = document.getElementById('chat');
+    const texto = input.value.trim();
+    if (!texto) return;
 
-            // USE A CHAVE NOVA QUE VOCÊ CRIOU NO "NEW PROJECT"
-            const MINHA_CHAVE = "AIzaSyAZEg5oAP7-yyNh0EjGNnaViElLk73_RvA"; 
+    // 1. ÚNICO LUGAR PARA A CHAVE (Use a do projeto "tinz clinic" que você ativou)
+    const MINHA_CHAVE = "AIzaSyCg3JGNmCpILxPjvm46QcVoqYRAk4j-pO4"; 
 
-            chat.innerHTML += `<div class="msg user">${texto}</div>`;
-            input.value = '';
+    chat.innerHTML += `<div class="msg user">${texto}</div>`;
+    input.value = '';
 
-            try {
-                // Rota direta SEM BIBLIOTECAS (mata o erro index.mjs)
-                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: texto }] }] })
-                });
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
-                const respostaIA = data.candidates[0].content.parts[0].text;
-                chat.innerHTML += `<div class="msg ai">${respostaIA}</div>`;
-            } catch (e) {
-                chat.innerHTML += `<div class="msg ai" style="color:red">Erro: ${e.message}</div>`;
-            }
-            chat.scrollTop = chat.scrollHeight;
+    try {
+        // 2. URL OFICIAL DE PRODUÇÃO (v1)
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${MINHA_CHAVE}`;
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: texto }] }]
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error.message);
+        }
+
+        const respostaIA = data.candidates[0].content.parts[0].text;
+        chat.innerHTML += `<div class="msg ai">${respostaIA}</div>`;
+    } catch (e) {
+        // Se der erro, ele vai te mostrar o motivo real aqui no chat
+        chat.innerHTML += `<div class="msg ai" style="color:red">Erro: ${e.message}</div>`;
+    }
+    chat.scrollTop = chat.scrollHeight;
+}
         }
     </script>
 </body>
