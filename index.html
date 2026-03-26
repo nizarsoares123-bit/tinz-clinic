@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TINZ Clinic - Assistente IA</title>
+    <style>
+        /* Cores da Identidade TINZ Clinic */
+        :root {
+            --primaria: #14B8A6; /* Turquesa Escuro */
+            --secundaria: #CCFBF1; /* Menta Clara */
+            --destaque: #5EEAD4; /* Verde Água */
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--secundaria); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+        }
+
+        header { 
+            background-color: var(--primaria); 
+            color: white; 
+            padding: 15px; 
+            text-align: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+
+        #chat-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+        }
+
+        .message { 
+            padding: 12px 18px; 
+            border-radius: 15px; 
+            max-width: 85%; 
+            font-size: 16px;
+            line-height: 1.5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .user-message { 
+            background-color: var(--primaria); 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 2px;
+        }
+
+        .ai-message { 
+            background-color: white; 
+            color: #333; 
+            align-self: flex-start; 
+            border: 1px solid var(--destaque); 
+            border-bottom-left-radius: 2px;
+        }
+
+        #input-area { 
+            background: white; 
+            padding: 20px; 
+            display: flex; 
+            gap: 10px; 
+            border-top: 2px solid var(--destaque); 
+        }
+
+        input { 
+            flex: 1; 
+            padding: 12px; 
+            border: 1px solid var(--primaria); 
+            border-radius: 8px; 
+            font-size: 16px;
+            outline: none; 
+        }
+
+        button { 
+            background-color: var(--destaque); 
+            border: none; 
+            padding: 10px 25px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: #0f766e; 
+            transition: 0.3s;
+        }
+
+        button:hover { 
+            background-color: var(--primaria); 
+            color: white; 
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>TINZ Clinic</h2>
+    <small>Gestão Inteligente em Saúde</small>
+</header>
+
+<div id="chat-container">
+    <div class="message ai-message">Bem-vindo à TINZ Clinic. Como posso auxiliar no atendimento ou prontuário hoje?</div>
+</div>
+
+<div id="input-area">
+    <input type="text" id="user-input" placeholder="Escreva aqui sua dúvida...">
+    <button onclick="enviarMensagem()">Enviar</button>
+</div>
+
+<script type="importmap">
+  {
+    "imports": {
+      "@google/generative-ai": "https://esm.run/@google/generative-ai"
+    }
+  }
+</script>
+
+<script type="module">
+  import { GoogleGenerativeAI } from "@google/generative-ai";
+
+  // --- CONFIGURAÇÃO DA CHAVE ---
+  // COLOQUE SUA CHAVE DO AI STUDIO ENTRE AS ASPAS ABAIXO:
+  const API_KEY = "AIzaSyAnDPn-LEHsp1U7pp3OHgL8Cqot51_wo-8"; 
+  // -----------------------------
+
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  // Vamos tirar o 'systemInstruction' por um segundo para testar a conexão pura
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+
+  window.enviarMensagem = async function() {
+    const input = document.getElementById('user-input');
+    const container = document.getElementById('chat-container');
+    const texto = input.value.trim();
+
+    if (!texto) return;
+
+    // Adiciona sua mensagem na tela
+    container.innerHTML += `<div class="message user-message">${texto}</div>`;
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+
+    try {
+      // Chama o Gemini
+      const result = await model.generateContent(texto);
+      const response = await result.response;
+      const respostaIA = response.text();
+
+      // Mostra a resposta da IA
+      container.innerHTML += `<div class="message ai-message">${respostaIA}</div>`;
+      container.scrollTop = container.scrollHeight;
+    } catch (error) {
+      console.error(error);
+      container.innerHTML += `<div class="message ai-message">Ops! Algo deu errado. Verifique se sua chave de API está correta.</div>`;
+    }
+  }
+</script>
+
+</body>
+</html>
